@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { execSync } from "child_process";
 import { intro, outro, confirm, isCancel, cancel, text } from "@clack/prompts";
 import color from "picocolors";
