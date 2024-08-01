@@ -1,0 +1,35 @@
+{
+	"name": "launchfast",
+	"version": "0.0.6",
+	"description": "LaunchFast CLI: One command to a fully featured, secure, production-ready starter app. Perfect boilerplate with all the essentials for developers.",
+	"type": "module",
+	"main": "index.js",
+	"bin": {
+		"launchfast": "index.js"
+	},
+	"homepage": "https://launchfast.pro",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/andrecasal/launch-fast-stack.git"
+	},
+	"keywords": [
+		"launchfast",
+		"cli",
+		"starter app",
+		"boilerplate",
+		"production-ready",
+		"secure app",
+		"developer tools",
+		"full-featured app",
+		"app stack",
+		"app development"
+	],
+	"author": "André Casal",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/andrecasal/launch-fast-stack/issues"
+	},
+	"engines": {
+		"node": "20"
+	}
+}
