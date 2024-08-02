@@ -17,8 +17,7 @@ async function main() {
    );
    if (!hasFly) {
       outro(color.red(`Fly CLI is required!`));
-      console.log(color.blue(`Please install the Fly CLI before proceeding.`));
-      console.log(color.blue(`https://fly.io/docs/flyctl/install/`));
+      console.log(color.blue(`Install the Fly CLI from https://fly.io/docs/flyctl/install/ before proceeding.`));
       console.log();
       return process.exit(0);
    }
