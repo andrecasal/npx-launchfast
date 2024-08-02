@@ -1,13 +1,29 @@
 #!/usr/bin/env node
 
+import { $ } from "execa";
 import { execSync } from "child_process";
 import { intro, outro, confirm, isCancel, cancel, text } from "@clack/prompts";
 import color from "picocolors";
 
 async function main() {
    console.log();
-   console.log(color.green("Please ensure you have purchased https://launchfast.pro before proceeding."));
+   console.log(color.blue(`Please ensure you have purchased https://launchfast.pro before proceeding.`));
    console.log();
+
+   intro(color.bgWhite(color.black(` Checking requirements`)));
+   const hasFly = await $`fly version`.then(
+      () => true,
+      () => false
+   );
+   if (!hasFly) {
+      outro(color.red(`Fly CLI is required!`));
+      console.log(color.blue(`Please install the Fly CLI before proceeding.`));
+      console.log(color.blue(`https://fly.io/docs/flyctl/install/`));
+      console.log();
+      return process.exit(0);
+   }
+   outro(color.green(`Fly CLI is installed!`));
+
    intro(color.bgWhite(color.black(` LaunchFast CLI`)));
 
    const hasPrivateAccessToken = await confirm({
@@ -63,7 +79,7 @@ async function main() {
    }
    outro(`Access granted! 🚀`);
 
-   const command = `npx --yes create-remix@latest --install --no-git-init --init-script --template andrecasal/launch-fast-stack --token ${privateAccessToken}`;
+   const command = `npx --yes create-remix@latest --git-init --install --init-script --template andrecasal/launch-fast-stack --token ${privateAccessToken}`;
    try {
       execSync(command, { stdio: "inherit" });
    } catch (error) {
