@@ -1,6 +1,6 @@
 {
 	"name": "launchfast",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"description": "LaunchFast CLI: One command to a fully featured, secure, production-ready starter app. Perfect boilerplate with all the essentials for developers.",
 	"type": "module",
 	"main": "index.js",
@@ -35,6 +35,8 @@
 	"dependencies": {
 		"@clack/prompts": "^0.7.0",
 		"execa": "^9.3.0",
+		"is-unicode-supported": "^2.0.0",
+		"open": "^10.1.0",
 		"picocolors": "^1.0.1"
 	}
 }

@@ -2,54 +2,61 @@
 
 import { $ } from "execa";
 import { execSync } from "child_process";
-import { intro, outro, confirm, isCancel, cancel, text } from "@clack/prompts";
+import { intro, spinner, confirm, isCancel, password, cancel, text, outro } from "@clack/prompts";
+import { note } from "./ui.js";
 import color from "picocolors";
+import open from "open";
 
 async function main() {
    console.log();
-   console.log(color.blue(`Please ensure you have purchased https://launchfast.pro before proceeding.`));
-   console.log();
+   intro(`Welcome to LaunchFast! 🚀`);
 
-   intro(color.bgWhite(color.black(` Checking requirements`)));
+   note(
+      `1. You've purchased https://launchfast.pro
+2. Accepted the invitation to LaunchFast's repo
+3. Installed Fly's CLI`,
+      `Requirements`
+   );
+
+   const s = spinner();
+   s.start(`Checking Fly's CLI...`);
    const hasFly = await $`fly version`.then(
       () => true,
       () => false
    );
+   s.stop(`Checked Fly's CLI!`);
+
+   // Check if the user has Fly's CLI installed
    if (!hasFly) {
-      outro(color.red(`Fly CLI is required!`));
-      console.log(color.blue(`Install the Fly CLI from https://fly.io/docs/flyctl/install/ before proceeding.`));
+      const shouldOpenFly = await confirm({
+         message: color.red(`You don't have the Fly CLI installed. Open https://fly.io/docs/flyctl/install/?`),
+      });
+      if (isCancel(shouldOpenFly)) {
+         cancel("Operation cancelled.");
+         process.exit(0);
+      }
+      if (shouldOpenFly) {
+         await open(`https://fly.io/docs/flyctl/install/`);
+      }
+      outro(`Ok, try again once you have Fly's CLI installed.`);
       console.log();
       return process.exit(0);
    }
-   outro(color.green(`Fly CLI is installed!`));
 
-   intro(color.bgWhite(color.black(` LaunchFast CLI`)));
-
-   const hasPrivateAccessToken = await confirm({
-      message: "Do you have a GitHub Private Access Token ready?",
+   const shouldCreateNewToken = await confirm({
+      message: "Create a new temporary GitHub Private Access Token?",
    });
-   if (isCancel(hasPrivateAccessToken)) {
+   if (isCancel(shouldCreateNewToken)) {
       cancel("Operation cancelled");
       return process.exit(0);
    }
-
-   if (!hasPrivateAccessToken) {
-      let createdPrivateAccessToken;
-      do {
-         createdPrivateAccessToken = await confirm({
-            message: "Visit https://github.com/settings/tokens/new?description=LaunchFast%20Private%20Access&scopes=repo and create a Private Access Token. Did you create one?",
-         });
-         if (isCancel(createdPrivateAccessToken)) {
-            cancel("Operation cancelled");
-            return process.exit(0);
-         }
-      } while (!createdPrivateAccessToken);
+   if (shouldCreateNewToken) {
+      await open(`https://github.com/settings/tokens/new?description=LaunchFast%20Private%20Access&scopes=repo`);
    }
 
-   const privateAccessToken = await text({
-      message: "Paste your Private Access Token here:",
-      placeholder: "ghp_...",
-      initialValue: "",
+   const privateAccessToken = await password({
+      message: "Paste your (classic) Private Access Token here:",
+      mask: "*",
       validate(value) {
          if (value.length === 0) return `A Private Access Token is required!`;
          if (!value.startsWith("ghp_")) return `Invalid Private Access Token!`;
@@ -70,14 +77,27 @@ async function main() {
    const userHasAccess = response.status === 302 || response.status === 200;
 
    if (!userHasAccess) {
-      outro(color.red(`Access denied! 🛑`));
-      console.log(color.blue(`After your purchase, you should have received an email inviting you to the LaunchFast private repository.`));
-      console.log(color.blue(`Please make sure you have accepted the invitation before using this CLI.`));
+      note(
+         `1. You've purchased LaunchFast
+2. Accepted the invitation to LaunchFast's repo`,
+         `🔴 Access denied! Make sure that:`
+      );
+      const shouldOpenLaunchFast = await confirm({
+         message: "Open https://launchfast.pro?",
+      });
+      if (isCancel(shouldOpenLaunchFast)) {
+         cancel("Operation cancelled");
+         return process.exit(0);
+      }
+      if (shouldOpenLaunchFast) {
+         await open(`https://launchfast.pro`);
+      }
+      outro(`Ok, try again after you've accepted the invitation to LaunchFast's repo.`);
       console.log();
-      return;
+      return process.exit(0);
    }
-   outro(`Access granted! 🚀`);
 
+   outro(`Access granted! 🚀`);
    const command = `npx --yes create-remix@latest --git-init --install --init-script --template andrecasal/launch-fast-stack --token ${privateAccessToken}`;
    try {
       execSync(command, { stdio: "inherit" });
