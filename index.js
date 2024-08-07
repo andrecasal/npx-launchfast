@@ -14,19 +14,16 @@ async function main() {
    note(
       `1. You've purchased https://launchfast.pro
 2. Accepted the invitation to LaunchFast's repo
-3. Installed Fly's CLI`,
+3. Installed Fly's CLI
+4. Created a (temporary) GitHub Private Access Token`,
       `Requirements`
    );
 
-   const s = spinner();
-   s.start(`Checking Fly's CLI...`);
+   // Check if the user has Fly's CLI installed
    const hasFly = await $`fly version`.then(
       () => true,
       () => false
    );
-   s.stop(`Checked Fly's CLI!`);
-
-   // Check if the user has Fly's CLI installed
    if (!hasFly) {
       const shouldOpenFly = await confirm({
          message: color.red(`You don't have the Fly CLI installed. Open https://fly.io/docs/flyctl/install/?`),
@@ -44,7 +41,7 @@ async function main() {
    }
 
    const shouldCreateNewToken = await confirm({
-      message: "Create a new temporary GitHub Private Access Token?",
+      message: `Create a new temporary GitHub Private Access Token?`,
    });
    if (isCancel(shouldCreateNewToken)) {
       cancel("Operation cancelled");
@@ -55,11 +52,11 @@ async function main() {
    }
 
    const privateAccessToken = await password({
-      message: "Paste your (classic) Private Access Token here:",
+      message: `Paste your (classic) GitHub Private Access Token here:`,
       mask: "*",
       validate(value) {
-         if (value.length === 0) return `A Private Access Token is required!`;
-         if (!value.startsWith("ghp_")) return `Invalid Private Access Token!`;
+         if (value.length === 0) return `A token is required!`;
+         if (!value.startsWith("ghp_")) return `Invalid token! It starts with "ghp_"`;
       },
    });
    if (isCancel(privateAccessToken)) {
