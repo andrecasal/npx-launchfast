@@ -1,16 +1,20 @@
 {
 	"name": "launchfast",
-	"version": "0.0.13",
+	"version": "0.0.16",
 	"description": "LaunchFast CLI: One command to a fully featured, secure, production-ready starter app. Perfect boilerplate with all the essentials for developers.",
 	"type": "module",
-	"main": "index.js",
+	"types": "./dist/index.d.ts",
 	"bin": {
-		"launchfast": "index.js"
+		"launchfast": "./dist/index.js"
 	},
 	"homepage": "https://launchfast.pro",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/andrecasal/launch-fast-stack.git"
+		"url": "git+https://github.com/Casal-Industries/launch-fast-stack.git"
+	},
+	"scripts": {
+		"build": "tsup",
+		"start": "node dist/index.js"
 	},
 	"keywords": [
 		"launchfast",
@@ -27,8 +31,9 @@
 	"author": "André Casal",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/andrecasal/launch-fast-stack/issues"
+		"url": "https://github.com/Casal-Industries/launch-fast-stack/issues"
 	},
+	"prettier": "@epic-web/config/prettier",
 	"engines": {
 		"node": "20"
 	},
@@ -38,5 +43,11 @@
 		"is-unicode-supported": "^2.0.0",
 		"open": "^10.1.0",
 		"picocolors": "^1.0.1"
+	},
+	"devDependencies": {
+		"@epic-web/config": "^1.12.0",
+		"@types/node": "^22.5.0",
+		"tsup": "^8.2.4",
+		"typescript": "^5.5.4"
 	}
 }
