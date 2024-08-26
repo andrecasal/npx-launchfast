@@ -75,7 +75,7 @@ async function main() {
 		}
 	}
 
-	const command = `npx --yes create-remix@latest ${ctx.folderName} --package-manager ${ctx.packageManager} --git-init --install --init-script --template andrecasal/launch-fast-stack --token ${ctx.privateAccessToken}`
+	const command = `npx --yes create-remix@latest ${ctx.folderName} --package-manager ${ctx.packageManager} --git-init --install --init-script --template casal-industries/launch-fast-stack --token ${ctx.privateAccessToken}`
 	try {
 		execSync(command, { stdio: 'inherit' })
 	} catch (error) {
@@ -155,7 +155,7 @@ const checkAccessStep = async () => {
 	const s = spinner()
 	s.start(`${ctx.progress}Checking access to the private repo...`)
 	const url =
-		'https://api.github.com/repos/andrecasal/launch-fast-stack/tarball'
+		'https://api.github.com/repos/casal-industries/launch-fast-stack/tarball'
 	const response = await fetch(url, {
 		method: 'HEAD',
 		headers: {

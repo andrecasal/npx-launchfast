@@ -1,6 +1,6 @@
 {
 	"name": "launchfast",
-	"version": "0.0.17",
+	"version": "0.0.18",
 	"description": "LaunchFast CLI: One command to a fully featured, secure, production-ready starter app. Perfect boilerplate with all the essentials for developers.",
 	"type": "module",
 	"types": "./dist/index.d.ts",
