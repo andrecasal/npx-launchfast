@@ -39,20 +39,40 @@ const ctx: Context = {
 	packageManagers: [],
 }
 
+const steps: (() => void | Promise<void>)[] = []
+
 async function main() {
-	const steps = createSteps()
+	getPackageManagers()
+	steps.push(
+		...[
+			introStep,
+			createPATStep,
+			getPATStep,
+			checkAccessStep,
+			ctx.packageManagers.length > 1 ? askPackageManagerStep : null,
+			createFolderStep,
+			outroStep,
+		].filter((f) => f !== null),
+	)
+
+	ctx.steps.total = steps.length - 2
 
 	try {
-		for (let step of steps) {
-			progressIndicator(ctx)
-			await step(ctx)
+		while (steps.length > 0) {
+			progressIndicator()
+			const step = steps.shift()!
+			const result = step()
+			if (result instanceof Promise) {
+				await result
+			}
 			ctx.steps.current++
 		}
 	} catch (err) {
-		/* if (ctx.debug) {
-			console.error(err)
-		} */
-		throw err
+		if (err instanceof Error) {
+			console.error(err.message)
+		} else {
+			console.log(err)
+		}
 	}
 
 	const command = `npx --yes create-remix@latest ${ctx.folderName} --package-manager ${ctx.packageManager} --git-init --install --init-script --template andrecasal/launch-fast-stack --token ${ctx.privateAccessToken}`
@@ -64,25 +84,7 @@ async function main() {
 	}
 }
 
-const createSteps = () => {
-	const steps = []
-	steps.push(introStep)
-	steps.push(createPATStep)
-	steps.push(getPATStep)
-	steps.push(checkAccessStep)
-	steps.push(createFolderStep)
-	const hasPackageManagerChoice = needToChoosePackageManager()
-	if (hasPackageManagerChoice) {
-		steps.push(packageManagerQuestionStep)
-	}
-	steps.push(outroStep)
-
-	ctx.steps.total = steps.length - 2
-
-	return steps
-}
-
-const needToChoosePackageManager = () => {
+const getPackageManagers = () => {
 	const packageManagers: { label: string; value: string }[] = []
 	try {
 		execSync(`npm --version`, { stdio: `ignore` })
@@ -99,24 +101,14 @@ const needToChoosePackageManager = () => {
 		packageManagers.push({ label: `pnpm`, value: `pnpm` })
 	} catch {}
 
-	if (packageManagers.length === 0) {
-		console.error(
-			`No package managers found. Please install npm, yarn, or pnpm.`,
-		)
-		return process.exit(1)
-	}
-
 	if (packageManagers.length === 1) {
 		ctx.packageManager = packageManagers[0].value
-		return false
 	}
 
 	ctx.packageManagers = packageManagers
-
-	return true
 }
 
-const progressIndicator = (ctx: Context) => {
+const progressIndicator = () => {
 	ctx.progress = `Step ${ctx.steps.current}/${ctx.steps.total}: `
 }
 
@@ -125,9 +117,9 @@ const introStep = async () => {
 	intro(`Welcome to LaunchFast.pro 🚀`)
 }
 
-const createPATStep = async (ctx: Context) => {
+const createPATStep = async () => {
 	const shouldCreateNewToken = await confirm({
-		message: `${ctx.progress}We need a Private Access Token (PAT) to download the template. Open GitHub to create one (use the default read-only scope, scroll down and press "Generate token")?`,
+		message: `${ctx.progress}We need a Private Access Token (PAT) to download the template. Open GitHub to create one (use the default read-only scope, scroll down, and press "Generate token")?`,
 		active: `Yes, open GitHub`,
 		inactive: `No, I already have a PAT`,
 	})
@@ -142,7 +134,7 @@ const createPATStep = async (ctx: Context) => {
 	}
 }
 
-const getPATStep = async (ctx: Context) => {
+const getPATStep = async () => {
 	const privateAccessToken = await password({
 		message: `${ctx.progress}Paste your GitHub PAT:`,
 		mask: '*',
@@ -159,7 +151,7 @@ const getPATStep = async (ctx: Context) => {
 	ctx.privateAccessToken = privateAccessToken
 }
 
-const checkAccessStep = async (ctx: Context) => {
+const checkAccessStep = async () => {
 	const s = spinner()
 	s.start(`${ctx.progress}Checking access to the private repo...`)
 	const url =
@@ -186,7 +178,7 @@ const checkAccessStep = async (ctx: Context) => {
 	s.stop(`${ctx.progress}🟢 Access granted!`)
 }
 
-const createFolderStep = async (ctx: Context) => {
+const createFolderStep = async () => {
 	const folderName = await text({
 		message: `${ctx.progress}Let's create a folder for your new project. What should we call it?`,
 		placeholder: `./my-new-project`,
@@ -201,7 +193,7 @@ const createFolderStep = async (ctx: Context) => {
 	ctx.folderName = folderName
 }
 
-const packageManagerQuestionStep = async (ctx: Context) => {
+const askPackageManagerStep = async () => {
 	const packageManager: symbol | string = await select({
 		message: `${ctx.progress}Select the package manager you'd like to use:`,
 		options: ctx.packageManagers,
