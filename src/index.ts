@@ -75,7 +75,7 @@ async function main() {
 		}
 	}
 
-	const command = `npx --yes create-remix@latest ${ctx.folderName} --package-manager ${ctx.packageManager} --git-init --install --init-script --template casal-industries/launch-fast-stack --token ${ctx.privateAccessToken}`
+	const command = `npx --yes create-remix@latest ${ctx.folderName} --package-manager ${ctx.packageManager} --git-init --install --init-script --template casal-innovations/launch-fast-stack --token ${ctx.privateAccessToken}`
 	try {
 		execSync(command, { stdio: 'inherit' })
 	} catch (error) {
