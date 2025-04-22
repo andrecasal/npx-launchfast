@@ -1,7 +1,7 @@
 {
 	"name": "launchfast",
 	"version": "0.0.19",
-	"description": "LaunchFast CLI: One command to a fully featured, secure, production-ready starter app. Perfect boilerplate with all the essentials for developers.",
+	"description": "LaunchFastPro CLI: One command to a fully featured, secure, production-ready starter app. Perfect boilerplate with all the essentials for developers.",
 	"type": "module",
 	"types": "./dist/index.d.ts",
 	"bin": {
@@ -14,7 +14,8 @@
 	},
 	"scripts": {
 		"build": "tsup",
-		"start": "node dist/index.js"
+		"start": "node dist/index.js",
+		"publish": "npm version patch && npm publish"
 	},
 	"keywords": [
 		"launchfast",
